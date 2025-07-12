@@ -28,5 +28,5 @@ class FoodType(str, Enum):
 class Item(BaseModel):
     diet: DietOption = DietOption.none
     type: FoodType = FoodType.random
-    difficulty: DifficultyOptions = DifficultyOptions.medium 
+    difficulty: DifficultyOptions = DifficultyOptions.medium
 

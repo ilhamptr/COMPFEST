@@ -1,6 +1,7 @@
 from fastapi import FastAPI,UploadFile,File
 import imageprocessing
-import imageModel
+from base import Item
+import AI_model
 app = FastAPI()
 
 
@@ -10,9 +11,10 @@ app = FastAPI()
 async def upload_image(file: UploadFile = File(...)):
     content,filename = await imageprocessing.validate_upload(file=file)
     data_url = await imageprocessing.local_image_to_data_url(file_name=filename,file_content=content)
-    response = await imageModel.model_image(data_url)
+    response = await AI_model.model_image(data_url)
     return {"data": response}
 
-@app.post("//",status_code=200)
-async def get_option(item):
-    pass
+@app.post("/recipe/",status_code=200)
+async def get_option(item:Item):
+
+    return {"item": item.dict()}
