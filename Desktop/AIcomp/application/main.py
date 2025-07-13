@@ -2,11 +2,10 @@ from fastapi import FastAPI,UploadFile,File
 import imageprocessing
 from base import Item
 import AI_model
+
 app = FastAPI()
 
-
 # FastAPI endpoint
-
 @app.post("/upload-image/",status_code=200)
 async def upload_image(file: UploadFile = File(...)):
     content,filename = await imageprocessing.validate_upload(file=file)
@@ -16,5 +15,7 @@ async def upload_image(file: UploadFile = File(...)):
 
 @app.post("/recipe/",status_code=200)
 async def get_option(item:Item):
-
-    return {"item": item.dict()}
+    item = item.model_dump()
+    input = dict(item)
+    result = await AI_model.recipe_model(input=input)
+    return result

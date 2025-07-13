@@ -1,7 +1,9 @@
 import os
-# import asyncio
+from langchain_openai import AzureChatOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage
 from dotenv import load_dotenv
 from openai import AzureOpenAI
+from base import ResponseFormatter
 from tavily import TavilyClient
 
 load_dotenv()
@@ -10,13 +12,16 @@ api_key= os.getenv("API_KEY")
 deployment_name = os.getenv("DEPLOYMENT_NAME")
 api_version = os.getenv("API_VERSION") # this might change in the future
 
-client = AzureOpenAI(
-    api_key=api_key,  
-    api_version=api_version,
-    base_url=f"{api_base}openai/deployments/{deployment_name}",
-)
+
+
 
 async def model_image(image_data):
+    client = AzureOpenAI(
+        api_key=api_key,  
+        api_version=api_version,
+        base_url=f"{api_base}openai/deployments/{deployment_name}",
+        )
+    
     response = client.chat.completions.create(
         model=deployment_name,
         messages=[
@@ -37,9 +42,7 @@ async def model_image(image_data):
         max_tokens=1000,
         temperature=1.0,
         frequency_penalty=0.0,
-        presence_penalty=0.2,
-        model=deployment_name
-    
+        presence_penalty=0.2    
     )
     return response
 
@@ -60,7 +63,15 @@ async def tavily_searching(recipe:str):
 
     return videos
 
-async def recipe_model(input:dict,ingredients:str):
+
+async def recipe_model(input:dict):
+    langchain_model = AzureChatOpenAI(api_key=api_key,
+                                    azure_endpoint=api_base,
+                                    azure_deployment=deployment_name,
+                                    openai_api_version=api_version,
+                                    temperature=1.0)
+    model_structured = langchain_model.bind_tools([ResponseFormatter])
+        
     system_prompt = f"""You are a helpful and knowledgeable cooking assistant. Your task is to suggest a common and well-known recipe based on the following user preferences:
     - **Ingredients**: The recipe must include all the given ingredients.
     - **Food Type**: The recipe should fit within the specified cuisine (e.g., Asian, Western, Indonesian, Middle Eastern, etc.).
@@ -74,9 +85,12 @@ async def recipe_model(input:dict,ingredients:str):
     5. Optional tips or common variations (if any).
     """
 
+
+
     diet = input["diet"]
     type = input["type"]
     difficulty = input["difficulty"]
+    ingredients = input["ingredients"]
 
     content_prompt = f"""
     Create a detailed recipe that meets the following criteria:
@@ -100,28 +114,14 @@ async def recipe_model(input:dict,ingredients:str):
     Required ingredients:
     {ingredients}
     """
- 
-    response = client.chat.completions.create(
-    messages=[
-        {
-            "role": "system",
-            "content": system_prompt,
-        },
-        {
-            "role": "user",
-            "content": content_prompt,
-        }
-    ],
-    max_completion_tokens=2000,
-    temperature=1.0,
-    frequency_penalty=0.0,
-    presence_penalty=0.2,
-    model=deployment_name
-    )
 
-    return response
+    messages = [
+    SystemMessage(system_prompt),
+    HumanMessage(content_prompt)
+]
 
-    
-    
-
-# asyncio.run(tavily_searching("recipe for Spiced Beef & Feta Fusion Pastries"))
+    response = await model_structured.ainvoke(messages)
+    recipe = response.tool_calls[0]["args"]
+    video_data= await tavily_searching(recipe=recipe["name"])
+    recipe.update({"video_data":video_data})
+    return recipe
