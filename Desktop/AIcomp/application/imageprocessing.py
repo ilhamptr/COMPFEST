@@ -2,6 +2,7 @@ import base64
 from fastapi import UploadFile,HTTPException
 from mimetypes import guess_type
 
+# validating input for valid extensions and file size
 async def validate_upload(file:UploadFile):
     allowed_extension = {"jpg", "jpeg", "png", "webp"}
     max_file_size = 5 * 1024 * 1024 
@@ -13,7 +14,7 @@ async def validate_upload(file:UploadFile):
         raise HTTPException(status_code=400,detail="file too large (maximum 5MB)")
     return content,file.filename
 
-# Function to encode a local image into data URL 
+# Function to encode a local image
 async def local_image_to_data_url(file_name:str,file_content:str):
     mime_type, _ = guess_type(file_name)
     if mime_type is None:

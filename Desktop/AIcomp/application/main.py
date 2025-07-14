@@ -6,6 +6,7 @@ import AI_model
 app = FastAPI()
 
 # FastAPI endpoint
+# endpoint for extracting ingredients based on image input
 @app.post("/upload-image/",status_code=200)
 async def upload_image(file: UploadFile = File(...)):
     content,filename = await imageprocessing.validate_upload(file=file)
@@ -13,9 +14,10 @@ async def upload_image(file: UploadFile = File(...)):
     response = await AI_model.model_image(data_url)
     return {"data": response}
 
+# endpoint for generating recipe
 @app.post("/recipe/",status_code=200)
 async def get_option(item:Item):
     item = item.model_dump()
     input = dict(item)
     result = await AI_model.recipe_model(input=input)
-    return result
+    return {"data":result}

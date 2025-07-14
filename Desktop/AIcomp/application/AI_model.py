@@ -6,6 +6,7 @@ from openai import AzureOpenAI
 from base import ResponseFormatter
 from tavily import TavilyClient
 
+# credentials for Model API etc
 load_dotenv()
 api_base = os.getenv("API_BASE") # your endpoint should look like the following https://YOUR_RESOURCE_NAME.openai.azure.com/
 api_key= os.getenv("API_KEY")
@@ -14,7 +15,7 @@ api_version = os.getenv("API_VERSION") # this might change in the future
 
 
 
-
+# model for extracting ingredients
 async def model_image(image_data):
     client = AzureOpenAI(
         api_key=api_key,  
@@ -44,11 +45,12 @@ async def model_image(image_data):
         frequency_penalty=0.0,
         presence_penalty=0.2    
     )
-    return response
+    result = response.choices[0].message
+    return result
 
-tavily_client = TavilyClient(os.getenv("TAVILY_API")) 
-
+# tavily search engine used for showing recipe videos
 async def tavily_searching(recipe:str):
+    tavily_client = TavilyClient(os.getenv("TAVILY_API")) 
     recipe = f"recipe for {recipe}"
     response = tavily_client.search(
         query=recipe,
@@ -63,7 +65,7 @@ async def tavily_searching(recipe:str):
 
     return videos
 
-
+# model for generating model based on ingredients and criteria input
 async def recipe_model(input:dict):
     langchain_model = AzureChatOpenAI(api_key=api_key,
                                     azure_endpoint=api_base,
@@ -99,7 +101,7 @@ async def recipe_model(input:dict):
 
     Dietary preference: {diet}
 
-    Cuisine type: Middle {type}
+    Cuisine type: {type}
 
     The recipe should include:
 

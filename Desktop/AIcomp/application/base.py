@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 from typing import List, Optional
 
-
+# Base model for valid option
 class DifficultyOptions(str, Enum):
     easy = "easy"
     medium = "medium"
@@ -32,7 +32,7 @@ class Item(BaseModel):
     difficulty: DifficultyOptions = DifficultyOptions.medium
     ingredients: str
 
-
+# response formatter for Recipe model 
 class ResponseFormatter(BaseModel):
     """Use this model to structure your generated recipe response."""
     
