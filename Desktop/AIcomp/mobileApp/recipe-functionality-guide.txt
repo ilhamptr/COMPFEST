@@ -1,0 +1,206 @@
+RECIPE FUNCTIONALITY GUIDE
+=========================
+
+This document explains the functionality and architecture of the recipe result page and its components.
+
+PROJECT STRUCTURE
+-----------------
+
+app/recipe/
+├── _layout.tsx          # Recipe section layout (without bottom navigation)
+└── result.tsx           # Main recipe result page
+
+components/
+├── RecipeHeader.tsx     # Header with back navigation and title
+├── ToolsList.tsx        # Kitchen tools required for recipe
+├── IngredientsList.tsx  # Recipe ingredients with amounts
+├── NutritionGrid.tsx    # Nutritional information display
+└── RecipeTutorial.tsx   # Recipe tutorial video section
+
+COMPONENT FUNCTIONALITY
+======================
+
+1. app/recipe/_layout.tsx
+-------------------------
+PURPOSE: Layout wrapper for recipe-related pages without bottom tab navigation
+FUNCTIONALITY:
+- Uses expo-router Stack navigation
+- Disables default header for custom header implementation
+- Provides clean navigation experience focused on recipe content
+
+2. app/recipe/result.tsx
+-----------------------
+PURPOSE: Main recipe result page displaying complete recipe information
+FUNCTIONALITY:
+- Displays recipe header with back navigation
+- Shows recipe hero image
+- Presents tools, ingredients, nutrition, and tutorial sections
+- Uses ScrollView for vertical content navigation
+- Implements SafeAreaView for proper screen boundaries
+- Contains structured recipe data (title, image, tools, ingredients, nutrition, tutorial)
+
+3. components/RecipeHeader.tsx
+-----------------------------
+PURPOSE: Reusable header component with back navigation and dynamic title
+FUNCTIONALITY:
+- Back button with router navigation (router.back())
+- Dynamic title display using props
+- Responsive layout with centered title
+- Consistent styling with Plus Jakarta Sans font
+
+4. components/ToolsList.tsx
+--------------------------
+PURPOSE: Display kitchen tools required for the recipe
+FUNCTIONALITY:
+- Accepts array of tools with icon, name, and optional width
+- Renders tools in grid layout (2 columns for first row, remaining tools in second row)
+- Uses existing ToolItem component for individual tool display
+- Responsive design adapting to different tool counts
+
+5. components/IngredientsList.tsx
+--------------------------------
+PURPOSE: Display recipe ingredients with their amounts
+FUNCTIONALITY:
+- Accepts array of ingredients (name and amount)
+- Automatically arranges ingredients in double rows where possible
+- Uses single row for odd last ingredient
+- Leverages existing IngredientDoubleRow and IngredientSingleRow components
+- Maintains consistent spacing and typography
+
+6. components/NutritionGrid.tsx
+------------------------------
+PURPOSE: Display nutritional information in organized grid format
+FUNCTIONALITY:
+- Accepts array of nutrition data (label and value)
+- Arranges nutrition items in 2-column grid layout
+- Creates bordered rows for visual separation
+- Uses existing NutritionItem component for individual nutrition display
+- Handles odd number of nutrition items gracefully
+
+7. components/RecipeTutorial.tsx
+-------------------------------
+PURPOSE: Display recipe tutorial video section
+FUNCTIONALITY:
+- Accepts YouTube URL and thumbnail image URL
+- Uses existing VideoPlayer component for video functionality
+- Maintains consistent section styling with other recipe sections
+- Provides engaging tutorial content integration
+
+DESIGN PATTERNS USED
+===================
+
+1. Component Composition
+- Main page assembles smaller, focused components
+- Each component handles specific functionality
+- Promotes reusability and maintainability
+
+2. Props-Based Configuration
+- Components accept data through props
+- Enables dynamic content rendering
+- Facilitates testing and reusability
+
+3. Responsive Design
+- Components adapt to different content amounts
+- Consistent spacing and layout principles
+- Mobile-first approach with proper touch targets
+
+4. Consistent Styling
+- Uses NativeWind classes for styling
+- Maintains design system colors and typography
+- Plus Jakarta Sans font throughout for consistency
+
+NAVIGATION ARCHITECTURE
+======================
+
+1. Stack Navigation
+- Uses expo-router Stack for recipe section
+- No bottom tab navigation in recipe pages
+- Clean, focused user experience
+
+2. Back Navigation
+- Consistent back button implementation
+- Uses router.back() for proper navigation history
+- Maintains user's navigation context
+
+STYLING APPROACH
+===============
+
+1. NativeWind Integration
+- Utility-first CSS classes
+- Consistent color palette (#171412 for text, #827569 for secondary)
+- Responsive design principles
+
+2. Typography
+- Plus Jakarta Sans font family
+- Consistent font weights (400, 700)
+- Proper line heights for readability
+
+3. Layout
+- Flexbox-based layouts
+- Consistent padding and margins (px-4, pt-5, pb-3)
+- Border styling for visual separation
+
+DATA STRUCTURE
+=============
+
+Recipe data is structured as:
+- title: string (recipe name)
+- image: string (hero image URL)
+- tools: array of {icon, name, width?}
+- ingredients: array of {name, amount}
+- nutrition: array of {label, value}
+- tutorial: {youtubeUrl, thumbnailUrl}
+
+USAGE INSTRUCTIONS
+=================
+
+1. Navigation to Recipe Result:
+   Use: router.push('/recipe/result') from any page
+
+2. Customizing Recipe Data:
+   Modify recipeData object in app/recipe/result.tsx or pass as props
+
+3. Adding New Recipe Pages:
+   Create new files in app/recipe/ directory following same pattern
+
+4. Extending Components:
+   All components accept props for customization and can be extended
+
+DEPENDENCIES
+===========
+
+- expo-router: Navigation
+- react-native: Core components
+- nativewind: Styling
+- expo-image: Optimized image handling
+- Existing components: ToolItem, IngredientRow, NutritionItem, VideoPlayer
+
+PERFORMANCE CONSIDERATIONS
+=========================
+
+1. Image Optimization
+- Uses expo-image for better performance
+- Proper resizeMode settings
+- Optimized image URLs
+
+2. ScrollView Optimization
+- showsVerticalScrollIndicator={false} for cleaner UI
+- Efficient layout without nested ScrollViews
+
+3. Component Separation
+- Small, focused components for better rendering performance
+- Proper key props for list rendering
+
+ACCESSIBILITY
+============
+
+1. Semantic Structure
+- Proper Text components for all text content
+- TouchableOpacity for interactive elements
+- SafeAreaView for proper screen boundaries
+
+2. Navigation
+- Clear back button functionality
+- Proper focus management
+
+This architecture provides a scalable, maintainable solution for recipe display functionality while maintaining excellent user experience and performance.

@@ -1,0 +1,806 @@
+BACKEND & AI INTEGRATION GUIDE FOR INGREDISH
+==========================================
+
+This comprehensive guide explains how to integrate backend services and AI features into your Ingredish React Native app. The foundation has been prepared with the proper architecture, types, services, and state management.
+
+TABLE OF CONTENTS
+================
+1. PROJECT STRUCTURE OVERVIEW
+2. ENVIRONMENT SETUP
+3. BACKEND INTEGRATION STEPS
+4. AI SERVICES INTEGRATION
+5. AUTHENTICATION IMPLEMENTATION
+6. STATE MANAGEMENT SETUP
+7. COMPONENT UPDATES
+8. TESTING STRATEGIES
+9. DEPLOYMENT CONSIDERATIONS
+10. PERFORMANCE OPTIMIZATION
+11. SECURITY BEST PRACTICES
+12. TROUBLESHOOTING
+
+===========================================
+
+1. PROJECT STRUCTURE OVERVIEW
+=============================
+
+The prepared architecture includes:
+
+types/
+├── recipe.ts         # Recipe data structures
+├── user.ts          # User and authentication types  
+├── ai.ts            # AI service types
+
+services/
+├── api.ts           # Base API service with error handling
+├── recipeService.ts # Recipe CRUD operations
+├── aiService.ts     # AI feature implementations
+├── authService.ts   # Authentication & user management
+
+store/
+├── index.ts         # Zustand stores for global state
+
+hooks/
+├── useRecipe.ts     # Recipe data fetching hooks
+├── useAuth.ts       # Authentication hooks
+
+utils/
+├── index.ts         # Utility functions
+
+config/
+├── env.ts           # Environment configuration
+
+providers/
+├── QueryProvider.tsx # React Query setup
+
+===========================================
+
+2. ENVIRONMENT SETUP
+====================
+
+2.1. Install Required Dependencies
+---------------------------------
+
+Run the following commands in your project root:
+
+
+# Core data fetching and state management
+npm install @tanstack/react-query zustand
+
+# AsyncStorage for local data persistence
+npm install @react-native-async-storage/async-storage
+
+# Network information for offline handling
+npm install @react-native-community/netinfo
+
+# State persistence for Zustand
+npm install zustand/middleware
+
+# Optional: For advanced image handling
+npm install expo-image-picker expo-media-library
+
+# Optional: For voice commands (if implementing AI voice features)
+npm install expo-speech expo-av
+
+# Optional: For camera features (ingredient recognition)
+npm install expo-camera
+
+# Optional: For location services (store recommendations)
+npm install expo-location
+```
+
+2.2. Environment Variables Setup
+-------------------------------
+
+Create a `.env` file in your project root:
+
+```env
+# API Configuration
+EXPO_PUBLIC_API_URL=https://your-backend-api.com
+EXPO_PUBLIC_AI_API_URL=https://your-ai-api.com
+
+# Authentication
+JWT_SECRET=your-jwt-secret-key
+
+# Third-party Services
+EXPO_PUBLIC_GOOGLE_API_KEY=your-google-api-key
+EXPO_PUBLIC_YOUTUBE_API_KEY=your-youtube-api-key
+
+# AI Services
+OPENAI_API_KEY=your-openai-api-key
+GOOGLE_VISION_API_KEY=your-google-vision-api-key
+
+# Image Storage
+EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloudinary-name
+CLOUDINARY_API_KEY=your-cloudinary-key
+
+# Feature Flags
+EXPO_PUBLIC_ENABLE_AI_FEATURES=true
+EXPO_PUBLIC_ENABLE_VOICE_COMMANDS=true
+
+# App Configuration
+EXPO_PUBLIC_APP_VERSION=1.0.0
+```
+
+===========================================
+
+3. BACKEND INTEGRATION STEPS
+============================
+
+3.1. Update Root Layout with Providers
+--------------------------------------
+
+Modify your `app/_layout.tsx`:
+
+```typescript
+import QueryProvider from '../providers/QueryProvider';
+import { Stack } from "expo-router";
+import "./globals.css";
+
+export default function RootLayout() {
+  return (
+    <QueryProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(root)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="recipe" options={{ headerShown: false }} />
+      </Stack>
+    </QueryProvider>
+  );
+}
+```
+
+3.2. Update Recipe Result Page
+-----------------------------
+
+Modify `app/recipe/result.tsx` to use dynamic data:
+
+```typescript
+import { useRecipe } from '../../hooks/useRecipe';
+import { useLocalSearchParams } from 'expo-router';
+
+export default function RecipeResult() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: recipe, isLoading, error } = useRecipe(id);
+
+  if (isLoading) {
+    // Return loading component
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    // Return error component
+    return <ErrorMessage error={error} />;
+  }
+
+  if (!recipe) {
+    return <NotFound />;
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Use recipe data from API */}
+      <RecipeHeader title={recipe.title} />
+      <Image source={{ uri: recipe.image }} /* ... */ />
+      <ToolsList tools={recipe.tools} />
+      <IngredientsList ingredients={recipe.ingredients} />
+      <NutritionGrid nutritionData={recipe.nutrition} />
+      <RecipeTutorial 
+        youtubeUrl={recipe.tutorial?.youtubeUrl} 
+        thumbnailUrl={recipe.tutorial?.thumbnailUrl} 
+      />
+    </SafeAreaView>
+  );
+}
+```
+
+3.3. Create Loading and Error Components
+----------------------------------------
+
+Create `components/LoadingSpinner.tsx`:
+
+```typescript
+import React from 'react';
+import { View, ActivityIndicator, Text } from 'react-native';
+
+export default function LoadingSpinner({ message = 'Loading...' }) {
+  return (
+    <View className="flex-1 justify-center items-center bg-white">
+      <ActivityIndicator size="large" color="#171412" />
+      <Text className="mt-4 text-gray-600">{message}</Text>
+    </View>
+  );
+}
+```
+
+Create `components/ErrorMessage.tsx`:
+
+```typescript
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+
+interface ErrorMessageProps {
+  error: string;
+  onRetry?: () => void;
+}
+
+export default function ErrorMessage({ error, onRetry }: ErrorMessageProps) {
+  return (
+    <View className="flex-1 justify-center items-center bg-white px-4">
+      <Text className="text-red-500 text-center mb-4">{error}</Text>
+      {onRetry && (
+        <TouchableOpacity 
+          onPress={onRetry}
+          className="bg-blue-500 px-4 py-2 rounded"
+        >
+          <Text className="text-white">Retry</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+```
+
+===========================================
+
+4. AI SERVICES INTEGRATION
+==========================
+
+4.1. Ingredient Recognition Feature
+----------------------------------
+
+Create `components/IngredientCamera.tsx`:
+
+```typescript
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { useIngredientRecognition } from '../hooks/useRecipe';
+
+export default function IngredientCamera() {
+  const [image, setImage] = useState<string | null>(null);
+  const recognitionMutation = useIngredientRecognition();
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setImage(result.assets[0].uri);
+      
+      // Convert to blob and recognize ingredients
+      const response = await fetch(result.assets[0].uri);
+      const blob = await response.blob();
+      
+      recognitionMutation.mutate(blob, {
+        onSuccess: (data) => {
+          console.log('Recognized ingredients:', data.ingredients);
+          // Handle recognized ingredients
+        }
+      });
+    }
+  };
+
+  return (
+    <View className="p-4">
+      <TouchableOpacity 
+        onPress={pickImage}
+        className="bg-blue-500 p-4 rounded"
+      >
+        <Text className="text-white text-center">Recognize Ingredients</Text>
+      </TouchableOpacity>
+      
+      {image && (
+        <Image source={{ uri: image }} className="w-full h-48 mt-4 rounded" />
+      )}
+      
+      {recognitionMutation.isLoading && (
+        <Text className="text-center mt-2">Analyzing image...</Text>
+      )}
+    </View>
+  );
+}
+```
+
+4.2. AI Recipe Generation
+-------------------------
+
+Create `components/AIRecipeGenerator.tsx`:
+
+```typescript
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { useGenerateRecipe } from '../hooks/useRecipe';
+
+export default function AIRecipeGenerator() {
+  const [ingredients, setIngredients] = useState('');
+  const generateMutation = useGenerateRecipe();
+
+  const generateRecipe = () => {
+    const ingredientList = ingredients.split(',').map(i => i.trim());
+    
+    generateMutation.mutate({
+      ingredients: ingredientList,
+      cuisine: 'any',
+      maxPrepTime: 30,
+      servings: 4,
+    }, {
+      onSuccess: (data) => {
+        console.log('Generated recipe:', data.recipe);
+        // Navigate to generated recipe
+      }
+    });
+  };
+
+  return (
+    <View className="p-4">
+      <TextInput
+        value={ingredients}
+        onChangeText={setIngredients}
+        placeholder="Enter ingredients (comma separated)"
+        className="border border-gray-300 p-3 rounded mb-4"
+        multiline
+      />
+      
+      <TouchableOpacity 
+        onPress={generateRecipe}
+        disabled={generateMutation.isLoading}
+        className="bg-green-500 p-4 rounded"
+      >
+        <Text className="text-white text-center">
+          {generateMutation.isLoading ? 'Generating...' : 'Generate Recipe'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+```
+
+===========================================
+
+5. AUTHENTICATION IMPLEMENTATION
+================================
+
+5.1. Create Authentication Screens
+----------------------------------
+
+Create `app/(auth)/login.tsx`:
+
+```typescript
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { useLogin } from '../../hooks/useAuth';
+import { useRouter } from 'expo-router';
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const loginMutation = useLogin();
+  const router = useRouter();
+
+  const handleLogin = () => {
+    loginMutation.mutate({ email, password }, {
+      onSuccess: () => {
+        router.replace('/(tabs)/home');
+      }
+    });
+  };
+
+  return (
+    <View className="flex-1 justify-center p-4 bg-white">
+      <TextInput
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Email"
+        className="border border-gray-300 p-3 rounded mb-4"
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      
+      <TextInput
+        value={password}
+        onChangeText={setPassword}
+        placeholder="Password"
+        className="border border-gray-300 p-3 rounded mb-4"
+        secureTextEntry
+      />
+      
+      <TouchableOpacity 
+        onPress={handleLogin}
+        disabled={loginMutation.isLoading}
+        className="bg-blue-500 p-4 rounded"
+      >
+        <Text className="text-white text-center">
+          {loginMutation.isLoading ? 'Logging in...' : 'Login'}
+        </Text>
+      </TouchableOpacity>
+      
+      {loginMutation.error && (
+        <Text className="text-red-500 text-center mt-2">
+          {loginMutation.error.message}
+        </Text>
+      )}
+    </View>
+  );
+}
+```
+
+5.2. Create Authentication Guard
+-------------------------------
+
+Create `components/AuthGuard.tsx`:
+
+```typescript
+import React, { useEffect } from 'react';
+import { useAuth, useInitializeAuth } from '../hooks/useAuth';
+import { useRouter } from 'expo-router';
+import LoadingSpinner from './LoadingSpinner';
+
+interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+}
+
+export default function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+  const { isLoading: isInitializing } = useInitializeAuth();
+
+  useEffect(() => {
+    if (!isInitializing && requireAuth && !isAuthenticated) {
+      router.replace('/(auth)/login');
+    }
+  }, [isAuthenticated, isInitializing, requireAuth]);
+
+  if (isInitializing || isLoading) {
+    return <LoadingSpinner message="Initializing..." />;
+  }
+
+  if (requireAuth && !isAuthenticated) {
+    return <LoadingSpinner message="Redirecting..." />;
+  }
+
+  return <>{children}</>;
+}
+```
+
+===========================================
+
+6. STATE MANAGEMENT SETUP
+=========================
+
+6.1. Initialize Stores in Root Layout
+------------------------------------
+
+Update your root layout to initialize stores:
+
+```typescript
+import { useEffect } from 'react';
+import { useAuthStore } from '../store';
+
+export default function RootLayout() {
+  const { setLoading } = useAuthStore();
+
+  useEffect(() => {
+    // Initialize app
+    setLoading(false);
+  }, []);
+
+  return (
+    <QueryProvider>
+      <AuthGuard requireAuth={false}>
+        {/* Your app content */}
+      </AuthGuard>
+    </QueryProvider>
+  );
+}
+```
+
+6.2. Use Stores in Components
+----------------------------
+
+Example usage in a component:
+
+```typescript
+import { useRecipeStore, useAuthStore } from '../store';
+
+export default function SomeComponent() {
+  const { favoriteRecipes, addToFavorites } = useRecipeStore();
+  const { user, isAuthenticated } = useAuthStore();
+
+  // Use store data and actions
+  return (
+    // Component JSX
+  );
+}
+```
+
+===========================================
+
+7. COMPONENT UPDATES
+====================
+
+7.1. Update Existing Components for Dynamic Data
+-----------------------------------------------
+
+Update `components/ToolsList.tsx`:
+
+```typescript
+// Add loading and error states
+if (isLoading) return <LoadingSpinner />;
+if (error) return <ErrorMessage error={error} />;
+
+// Rest of component remains the same
+```
+
+7.2. Add Offline Support
+-----------------------
+
+Create `components/OfflineNotice.tsx`:
+
+```typescript
+import React from 'react';
+import { View, Text } from 'react-native';
+import { useNetInfo } from '@react-native-community/netinfo';
+
+export default function OfflineNotice() {
+  const netInfo = useNetInfo();
+
+  if (netInfo.isConnected) return null;
+
+  return (
+    <View className="bg-red-500 p-2">
+      <Text className="text-white text-center">
+        You're offline. Some features may not be available.
+      </Text>
+    </View>
+  );
+}
+```
+
+===========================================
+
+8. TESTING STRATEGIES
+=====================
+
+8.1. Unit Testing Setup
+----------------------
+
+Install testing dependencies:
+
+```bash
+npm install --save-dev jest @testing-library/react-native
+```
+
+Create `__tests__/services/recipeService.test.ts`:
+
+```typescript
+import { RecipeService } from '../../services/recipeService';
+
+describe('RecipeService', () => {
+  test('should fetch recipe by ID', async () => {
+    const recipe = await RecipeService.getRecipe('123');
+    expect(recipe).toBeDefined();
+    expect(recipe.id).toBe('123');
+  });
+});
+```
+
+8.2. Integration Testing
+-----------------------
+
+Test API integration with mock servers:
+
+```typescript
+// Use MSW (Mock Service Worker) for API mocking
+import { setupServer } from 'msw/node';
+import { rest } from 'msw';
+
+const server = setupServer(
+  rest.get('/api/recipes/:id', (req, res, ctx) => {
+    return res(ctx.json({ data: mockRecipe }));
+  })
+);
+```
+
+===========================================
+
+9. DEPLOYMENT CONSIDERATIONS
+============================
+
+9.1. Environment-Specific Builds
+-------------------------------
+
+Configure `app.json` for different environments:
+
+```json
+{
+  "expo": {
+    "extra": {
+      "apiUrl": {
+        "development": "http://localhost:3000",
+        "staging": "https://staging-api.ingredish.com",
+        "production": "https://api.ingredish.com"
+      }
+    }
+  }
+}
+```
+
+9.2. Build Optimization
+----------------------
+
+Add to `metro.config.js`:
+
+```javascript
+module.exports = {
+  transformer: {
+    minifierConfig: {
+      keep_fnames: true,
+      mangle: {
+        keep_fnames: true,
+      },
+    },
+  },
+};
+```
+
+===========================================
+
+10. PERFORMANCE OPTIMIZATION
+============================
+
+10.1. Image Optimization
+-----------------------
+
+Use optimized image loading:
+
+```typescript
+import { Image } from 'expo-image';
+
+// Use instead of regular Image component
+<Image 
+  source={{ uri: recipe.image }}
+  placeholder="recipe-placeholder"
+  transition={300}
+  contentFit="cover"
+/>
+```
+
+10.2. List Optimization
+----------------------
+
+For large lists, implement virtualization:
+
+```typescript
+import { FlashList } from '@shopify/flash-list';
+
+<FlashList
+  data={recipes}
+  renderItem={({ item }) => <RecipeCard recipe={item} />}
+  estimatedItemSize={200}
+/>
+```
+
+===========================================
+
+11. SECURITY BEST PRACTICES
+===========================
+
+11.1. API Security
+-----------------
+
+- Always validate data on both client and server
+- Use HTTPS for all API communications
+- Implement proper authentication token handling
+- Store sensitive data securely using Keychain/Keystore
+
+11.2. Data Validation
+--------------------
+
+```typescript
+import { z } from 'zod';
+
+const RecipeSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  // ... other fields
+});
+
+// Validate API responses
+const validatedRecipe = RecipeSchema.parse(apiResponse);
+```
+
+===========================================
+
+12. TROUBLESHOOTING
+==================
+
+Common Issues and Solutions:
+
+12.1. Network Requests Failing
+-----------------------------
+- Check environment variables
+- Verify API endpoints
+- Check network connectivity
+- Review CORS settings
+
+12.2. State Not Updating
+-----------------------
+- Verify store connections
+- Check React Query cache settings
+- Ensure proper key dependencies
+
+12.3. Images Not Loading
+-----------------------
+- Check image URLs
+- Verify network permissions
+- Test image optimization settings
+
+12.4. Authentication Issues
+--------------------------
+- Verify token storage/retrieval
+- Check token expiration handling
+- Test refresh token flow
+
+===========================================
+
+IMPLEMENTATION CHECKLIST
+========================
+
+Phase 1: Foundation
+□ Install dependencies
+□ Setup environment variables
+□ Configure providers in root layout
+□ Test basic API connectivity
+
+Phase 2: Core Features
+□ Implement recipe fetching
+□ Add authentication screens
+□ Setup state management
+□ Add loading/error states
+
+Phase 3: AI Features
+□ Implement ingredient recognition
+□ Add recipe generation
+□ Setup voice commands (if needed)
+□ Add smart recommendations
+
+Phase 4: Enhancement
+□ Add offline support
+□ Implement caching strategies
+□ Add performance optimizations
+□ Setup analytics and monitoring
+
+Phase 5: Testing & Deployment
+□ Write unit tests
+□ Add integration tests
+□ Setup CI/CD pipeline
+□ Configure production builds
+
+===========================================
+
+NEXT STEPS
+==========
+
+1. Start with Phase 1 - Foundation setup
+2. Test each feature incrementally
+3. Monitor performance and user feedback
+4. Iterate and improve based on usage data
+
+For questions or issues during implementation:
+- Check the type definitions in types/ folder
+- Review service implementations in services/ folder
+- Refer to hook examples in hooks/ folder
+- Use utility functions from utils/ folder
+
+The architecture is designed to be scalable and maintainable. Each component can be enhanced independently as your backend and AI capabilities grow.
+
+Good luck with your integration! 🚀
