@@ -14,15 +14,15 @@ export default function RecipeResult() {
       "https://api.builder.io/api/v1/image/assets/TEMP/20a37ddb6ce99ce288aef72874398afbc00023a1?width=824",
     tools: [
       {
-        icon: "https://api.builder.io/api/v1/image/assets/TEMP/ed9c5a673dd160351cb3f4bd2700b81034c67746?width=48",
+        iconName: "frying.pan",
         name: "Pan",
       },
       {
-        icon: "https://api.builder.io/api/v1/image/assets/TEMP/08ce1653faaaa74c07b18b6e2038bf3e869b899a?width=48",
+        iconName: "scissors",
         name: "Knife",
       },
       {
-        icon: "https://api.builder.io/api/v1/image/assets/TEMP/30f49c71e13f57e32895ae3984db735eb7b0464e?width=48",
+        iconName: "square.on.square",
         name: "Cutting Board",
         width: "w-[173px]",
       },

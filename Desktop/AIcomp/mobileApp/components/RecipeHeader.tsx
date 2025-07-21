@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { SymbolView } from "expo-symbols";
 
 interface RecipeHeaderProps {
   title: string;
@@ -19,12 +20,10 @@ export default function RecipeHeader({ title }: RecipeHeaderProps) {
         onPress={handleBack}
         className="w-12 h-12 items-center justify-center"
       >
-        <Image
-          source={{
-            uri: "https://api.builder.io/api/v1/image/assets/TEMP/e32e36a0f815dcb82df3087177715cf55a5aea89?width=48",
-          }}
-          className="w-6 h-6"
-          resizeMode="contain"
+        <SymbolView
+          name="chevron.left"
+          size={24}
+          tintColor="#171412"
         />
       </TouchableOpacity>
       <View className="flex-1 pr-12 items-center">

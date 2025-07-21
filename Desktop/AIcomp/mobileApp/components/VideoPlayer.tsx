@@ -1,5 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, Image, Linking } from "react-native";
+import { SymbolView } from "expo-symbols";
 
 interface VideoPlayerProps {
   youtubeUrl?: string;
@@ -40,13 +41,10 @@ export default function VideoPlayer({
       {/* Play Button Overlay */}
       <View className="absolute inset-0 items-center justify-center">
         <View className="w-16 h-16 items-center justify-center rounded-full bg-black/40">
-          <Image
-            source={{
-              uri: "https://api.builder.io/api/v1/image/assets/TEMP/d835a223fad99b5fcd8849f2a4e98450c0b8fea0?width=48",
-            }}
-            className="w-6 h-6"
-            style={{ tintColor: "white" }}
-            resizeMode="contain"
+          <SymbolView
+            name="play.fill"
+            size={24}
+            tintColor="white"
           />
         </View>
       </View>

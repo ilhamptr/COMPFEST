@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import ToolItem from "./ToolItem";
 
 interface Tool {
-  icon: string;
+  iconName: string;
   name: string;
   width?: string;
 }
@@ -32,7 +32,7 @@ export default function ToolsList({ tools }: ToolsListProps) {
           {tools.slice(0, 2).map((tool, index) => (
             <ToolItem
               key={index}
-              icon={tool.icon}
+              iconName={tool.iconName}
               name={tool.name}
               width={tool.width}
             />
@@ -45,7 +45,7 @@ export default function ToolsList({ tools }: ToolsListProps) {
             {tools.slice(2).map((tool, index) => (
               <ToolItem
                 key={index + 2}
-                icon={tool.icon}
+                iconName={tool.iconName}
                 name={tool.name}
                 width={tool.width}
               />

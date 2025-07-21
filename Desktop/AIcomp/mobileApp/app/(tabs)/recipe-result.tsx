@@ -8,6 +8,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import ToolItem from "../../components/ToolItem";
 import {
   IngredientDoubleRow,
@@ -33,12 +34,10 @@ export default function RecipeResult() {
               onPress={handleBack}
               className="w-12 h-12 items-center justify-center"
             >
-              <Image
-                source={{
-                  uri: "https://api.builder.io/api/v1/image/assets/TEMP/e32e36a0f815dcb82df3087177715cf55a5aea89?width=48",
-                }}
-                className="w-6 h-6"
-                resizeMode="contain"
+              <SymbolView
+                name="chevron.left"
+                size={24}
+                tintColor="#171412"
               />
             </TouchableOpacity>
             <View className="flex-1 pr-12 items-center">
@@ -74,11 +73,11 @@ export default function RecipeResult() {
             {/* First row of tools */}
             <View className="flex-row gap-3 mb-3">
               <ToolItem
-                icon="https://api.builder.io/api/v1/image/assets/TEMP/ed9c5a673dd160351cb3f4bd2700b81034c67746?width=48"
+                iconName="frying.pan"
                 name="Pan"
               />
               <ToolItem
-                icon="https://api.builder.io/api/v1/image/assets/TEMP/08ce1653faaaa74c07b18b6e2038bf3e869b899a?width=48"
+                iconName="scissors"
                 name="Knife"
               />
             </View>
@@ -86,7 +85,7 @@ export default function RecipeResult() {
             {/* Second row of tools */}
             <View className="flex-row">
               <ToolItem
-                icon="https://api.builder.io/api/v1/image/assets/TEMP/30f49c71e13f57e32895ae3984db735eb7b0464e?width=48"
+                iconName="square.on.square"
                 name="Cutting Board"
                 width="w-[173px]"
               />
@@ -166,6 +165,9 @@ export default function RecipeResult() {
               thumbnailUrl="https://api.builder.io/api/v1/image/assets/TEMP/dc8168558ef628347c6634666eefc1c79fcbd033?width=760"
             />
           </View>
+
+          {/* Bottom Navigation Space */}
+          <View className="h-20" />
         </View>
       </ScrollView>
     </SafeAreaView>

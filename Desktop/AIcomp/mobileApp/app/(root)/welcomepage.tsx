@@ -7,13 +7,6 @@ interface WelcomePageProps {
 }
 
 export default function WelcomePage({ onGetStarted }: WelcomePageProps) {
-  const handleGetStarted = () => {
-    if (onGetStarted) {
-      onGetStarted();
-    } else {
-      console.log("Get Started pressed");
-    }
-  };
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
@@ -48,7 +41,7 @@ export default function WelcomePage({ onGetStarted }: WelcomePageProps) {
             </View>
           </View>
 
-          <GetStartedButton onPress={handleGetStarted} />
+          <GetStartedButton onPress={onGetStarted} />
 
           <View className="px-4 pt-1 pb-3">
             <Text

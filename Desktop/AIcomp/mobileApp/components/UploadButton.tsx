@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { SymbolView } from "expo-symbols";
 
 interface UploadButtonProps {
   onImageSelected: (imageUri: string) => void;
@@ -54,12 +55,11 @@ export default function UploadButton({ onImageSelected }: UploadButtonProps) {
       }}
     >
       <View className="w-full h-[47px] bg-[#F09642] rounded-[15px] flex-row items-center justify-center">
-        <Image
-          source={{
-            uri: "https://api.builder.io/api/v1/image/assets/TEMP/94119db8d29d9a24a679d70272d9bdf3601506b7?width=48",
-          }}
-          className="w-6 h-6 mr-2"
-          resizeMode="contain"
+        <SymbolView
+          name="photo"
+          size={24}
+          tintColor="black"
+          style={{ marginRight: 8 }}
         />
         <Text
           className="text-black text-base font-bold"
