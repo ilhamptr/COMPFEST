@@ -8,7 +8,7 @@ VENV_DIR="$PROJECT_DIR/venv"
 ENV_FILE="$PROJECT_DIR/.env"
 
 # user input for service name config
-read -p "enter name for systemd service: " SERVICE_NAME
+read -p "enter name for fastapi systemd service: " SERVICE_NAME
 SERVICE_NAME=${SERVICE_NAME:-fastapi-app}
 
 # start script
