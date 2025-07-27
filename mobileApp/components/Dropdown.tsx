@@ -30,22 +30,21 @@ export default function Dropdown({
         </Text>
         <TouchableOpacity
           onPress={() => setIsOpen(!isOpen)}
-          className="w-[120px] h-[30px] bg-[#F1F1F1] rounded-[20px] flex-row items-center justify-between px-3"
+          className="w-[100px] h-[32px] bg-white rounded-[20px] border border-black flex-row items-center justify-between px-3"
         >
           <Text
-            className="text-black text-sm"
+            className="text-black text-sm flex-1"
             style={{ fontFamily: "Plus Jakarta Sans" }}
+            numberOfLines={1}
           >
             {value}
           </Text>
-          <View className="transform rotate-0">
-            <Text className="text-black text-xs">▼</Text>
-          </View>
+          <Text className="text-black text-xs">⌄</Text>
         </TouchableOpacity>
       </View>
 
       {isOpen && (
-        <View className="absolute top-10 right-0 w-[120px] bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+        <View className="absolute top-10 right-0 w-[100px] bg-white border border-black rounded-lg shadow-lg z-10">
           {options.map((option, index) => (
             <TouchableOpacity
               key={index}
@@ -53,7 +52,7 @@ export default function Dropdown({
                 onSelect(option);
                 setIsOpen(false);
               }}
-              className="px-3 py-2 border-b border-gray-200"
+              className="px-3 py-2 border-b border-black"
             >
               <Text
                 className="text-black text-sm"

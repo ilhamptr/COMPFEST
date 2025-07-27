@@ -8,32 +8,34 @@ interface ToolItemProps {
   width?: string;
 }
 
-const getSymbolName = (toolName: string): string => {
-  switch (toolName.toLowerCase()) {
-    case 'pan':
-      return 'frying.pan';
-    case 'knife':
-      return 'scissors';
-    case 'cutting board':
-      return 'square.on.square';
-    default:
-      return 'gear';
-  }
-};
-
+// Use the iconName prop directly instead of trying to map from name
 export default function ToolItem({
   iconName,
   name,
   width = "flex-1",
 }: ToolItemProps) {
-  const symbolName = getSymbolName(name);
+  // Provide a fallback for invalid symbol names
+  const getValidSymbolName = (symbolName: string) => {
+    const validSymbols = [
+      'frying.pan',
+      'scissors',
+      'square.on.square',
+      'pot',
+      'bowl',
+      'wrench.and.screwdriver',
+      'questionmark',
+      'gear'
+    ];
+
+    return validSymbols.includes(symbolName) ? symbolName : 'wrench.and.screwdriver';
+  };
 
   return (
     <View
       className={`${width} p-4 rounded-lg border border-[#E3E0DE] bg-white flex-row items-center gap-3`}
     >
       <SymbolView
-        name={symbolName}
+        name={getValidSymbolName(iconName) as any}
         size={24}
         tintColor="#171412"
       />

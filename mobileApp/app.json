@@ -4,7 +4,7 @@
     "slug": "ingredish",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/image.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "ingredish",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -28,7 +28,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/image.png",
+          "image": "./assets/images/splash.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
