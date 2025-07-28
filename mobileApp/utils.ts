@@ -35,18 +35,18 @@ export const capitalize = (text: string): string => {
 };
 
 /**
- * Get the color associated with a difficulty level (Tailwind class)
+ * Get the color associated with a difficulty level (hex color value)
  */
 export const getDifficultyColor = (difficulty: string): string => {
   const normalizedDifficulty = difficulty?.toLowerCase();
   if (normalizedDifficulty.includes('easy') || normalizedDifficulty.includes('simple')) {
-    return 'bg-green-500';
+    return '#22C55E'; // Green
   } else if (normalizedDifficulty.includes('medium') || normalizedDifficulty.includes('moderate')) {
-    return 'bg-yellow-500';
+    return '#EAB308'; // Yellow
   } else if (normalizedDifficulty.includes('hard') || normalizedDifficulty.includes('difficult') || normalizedDifficulty.includes('challenging')) {
-    return 'bg-red-500';
+    return '#EF4444'; // Red
   }
-  return 'bg-yellow-500'; // Default to yellow for unknown difficulties
+  return '#EAB308'; // Default to yellow for unknown difficulties
 };
 
 /**

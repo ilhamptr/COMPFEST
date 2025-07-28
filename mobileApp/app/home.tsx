@@ -7,6 +7,7 @@ import {
   ScrollView,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Dropdown from "../components/Dropdown";
@@ -20,7 +21,7 @@ export default function HomePage() {
   const router = useRouter();
   const { setRecipeData, isLoading, setIsLoading } = useRecipe();
   const [detectedIngredients, setDetectedIngredients] = useState(
-    "Chicken, Brocoli, Garlic",
+    "",
   );
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -52,11 +53,11 @@ export default function HomePage() {
       .join('\n');
   };
 
-  const handleImageSelected = (imageUri: string) => {
-    setSelectedImage(imageUri);
-    // Simulate ingredient detection from image
-    setDetectedIngredients("Chicken, Broccoli, Garlic, Onion");
-    console.log("Image selected:", imageUri);
+  const handleImageSelected = (recognizedIngredients: string) => {
+    // Update the detected ingredients with AI-recognized content
+    console.log("handleImageSelected called with:", recognizedIngredients);
+    setDetectedIngredients(recognizedIngredients);
+    console.log("AI recognized ingredients:", recognizedIngredients);
   };
 
   const handleIngredientsChange = (ingredients: string) => {
@@ -72,10 +73,13 @@ export default function HomePage() {
       selectedImage,
     });
 
+    // Ensure loading state is set immediately
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
       const finalFoodType = selectedFoodType === "Random" ? getRandomFoodType() : selectedFoodType.toLowerCase();
 
+      console.log("Starting API call...");
       const recipeData = await generateRecipe({
         diet: selectedDiet === "None" ? "no special diet" : selectedDiet.toLowerCase(),
         type: finalFoodType,
@@ -86,17 +90,24 @@ export default function HomePage() {
       console.log("Recipe generated successfully:", recipeData);
 
       // Store the recipe data in context - extract the actual data from the nested response
-      // Your API structure is response.data.data.cook_time, so we need to go deeper
       const actualRecipeData = recipeData?.data?.data || recipeData?.data || recipeData;
       console.log("Storing recipe data:", actualRecipeData);
       setRecipeData(actualRecipeData);
 
+      console.log("Navigating to recipe result...");
       // Navigate to recipe result page
       router.push("/recipe-result");
     } catch (error) {
       console.error("Failed to generate recipe:", error);
-      // Handle error - maybe show an alert or error message
+
+      // Show user-friendly error message
+      Alert.alert(
+        "Connection Error",
+        "Unable to generate recipe. Please check your internet connection and try again.",
+        [{ text: "OK" }]
+      );
     } finally {
+      // Ensure loading state is reset
       setIsLoading(false);
     }
   };

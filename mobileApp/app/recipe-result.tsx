@@ -129,7 +129,10 @@ export default function RecipeResult() {
               <RecipeDetailRow
                 label="Difficulty"
                 value={
-                  <View className={`px-3 py-1 rounded-full ${getDifficultyColor(data.difficulty)}`}>
+                  <View
+                    className="px-3 py-1 rounded-full"
+                    style={{ backgroundColor: getDifficultyColor(data.difficulty) }}
+                  >
                     <Text className="text-white text-sm font-bold">{capitalize(data.difficulty)}</Text>
                   </View>
                 }

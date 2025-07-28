@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput, Modal } from "react-native";
 
 interface IngredientsEditorProps {
@@ -12,6 +12,12 @@ export default function IngredientsEditor({
 }: IngredientsEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editableText, setEditableText] = useState(ingredients);
+
+  // Update editableText when ingredients prop changes (from image recognition)
+  useEffect(() => {
+    console.log("IngredientsEditor: ingredients prop changed to:", ingredients);
+    setEditableText(ingredients);
+  }, [ingredients]);
 
   const handleSave = () => {
     onSave(editableText);
@@ -45,7 +51,7 @@ export default function IngredientsEditor({
             className="text-black text-sm font-normal leading-[21px] flex-1"
             style={{ fontFamily: "Plus Jakarta Sans" }}
           >
-            {ingredients}
+            {ingredients || "No ingredients detected yet. Upload an image to get started."}
           </Text>
           <View className="absolute bottom-2 right-2">
             <Text
