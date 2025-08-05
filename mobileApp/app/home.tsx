@@ -14,7 +14,7 @@ import Dropdown from "../components/Dropdown";
 import UploadButton from "../components/UploadButton";
 import SubmitButton from "../components/SubmitButton";
 import IngredientsEditor from "../components/IngredientsEditor";
-import { generateRecipe } from "../services/aiService";
+import { generateRecipe, pingServer } from "../services/aiService";
 import { useRecipe } from "../contexts/RecipeContext";
 
 export default function HomePage() {
@@ -112,6 +112,20 @@ export default function HomePage() {
     }
   };
 
+  // Debug function - simple network test
+  const handleNetworkTest = async () => {
+    try {
+      const result = await pingServer();
+      Alert.alert(
+        "Network Test",
+        `${result.message}\nStatus: ${result.status}`,
+        [{ text: "OK" }]
+      );
+    } catch (error) {
+      Alert.alert("Network Test Failed", "Unable to reach server");
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -129,6 +143,15 @@ export default function HomePage() {
             >
               IngreDish
             </Text>
+
+            {/* Debug Network Test Button */}
+            <TouchableOpacity
+              onPress={handleNetworkTest}
+              className="absolute left-[35px] top-10 bg-gray-200 rounded-full px-2 py-1"
+            >
+              <Text className="text-xs text-gray-600">🔧</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity className="absolute right-[35px] top-10">
               <Image
                 source={{ uri: "https://api.builder.io/api/v1/image/assets/TEMP/7ffac22e335e57812d4cc4931a6572d9f3904662?width=48" }}

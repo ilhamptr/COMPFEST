@@ -44,15 +44,21 @@
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.ACCESS_WIFI_STATE"
       ],
-      "networkSecurityConfig": {
-        "cleartextTrafficPermitted": true,
-        "domain-config": [
-          {
-            "domain": "15.235.185.245",
-            "cleartextTrafficPermitted": true
-          }
-        ]
-      }
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "ingredish"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 16.17.0",
+    "version": ">= 16.17.3",
     "appVersionSource": "remote"
   },
   "build": {
@@ -15,7 +15,8 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "gradleCommand": ":app:assembleRelease",
+        "artifactPath": "ingredish.apk"
       },
       "ios": {
         "simulator": true
@@ -24,8 +25,17 @@
     "production": {
       "autoIncrement": true,
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "artifactPath": "ingredish.apk"
       }
+    },
+    "development-simulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "environment": "development"
     }
   },
   "submit": {

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Alert, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
+import { uploadImage } from "../services/aiService";
 
 interface UploadButtonProps {
   onImageSelected: (ingredients: string) => void;
@@ -35,57 +35,17 @@ export default function UploadButton({ onImageSelected }: UploadButtonProps) {
         // Show loading state
         Alert.alert("Processing", "Analyzing image...");
 
-        // Prepare the image for upload using React Native FormData
-        const formData = new FormData();
-        formData.append("file", {
-          uri: imageUri,
-          name: "upload.jpg",
-          type: "image/jpeg",
-        } as any);
+        // Use the aiService uploadImage function
+        const formattedIngredients = await uploadImage(imageUri);
 
-        // Send the image to the AI server
-        const response = await axios.post(
-          "http://15.235.185.245/upload-image/",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            timeout: 30000, // 30 second timeout
-          },
-        );
-
-        // Extract AI response and pass it to the input field
-        const rawIngredients = response.data.data?.content || response.data.content || response.data.recognized_text || response.data.recognizedText || "";
-        console.log("Raw AI response:", rawIngredients);
-
-        // Convert numbered list to comma-separated format
-        const formattedIngredients = rawIngredients
-          .split('\n')
-          .map(line => line.replace(/^\d+\.\s*/, '').trim()) // Remove number and dot
-          .filter(line => line.length > 0) // Remove empty lines
-          .join(', '); // Join with commas
-
-        console.log("Formatted ingredients:", formattedIngredients);
         onImageSelected(formattedIngredients);
-
         Alert.alert("Success", "Image analyzed successfully!");
-        console.log("Server Response:", response.data);
       }
     } catch (error) {
       console.error("Error uploading image:", error);
 
-      let errorMessage = "Failed to upload the image.";
-      if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNABORTED") {
-          errorMessage = "Request timed out. Please try again.";
-        } else if (error.response) {
-          errorMessage = `Server error: ${error.response.status}`;
-        } else if (error.request) {
-          errorMessage = "Network error. Please check your connection.";
-        }
-      }
-
+      // Use the error message from aiService
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload the image.";
       Alert.alert("Upload Failed", errorMessage);
     }
   };

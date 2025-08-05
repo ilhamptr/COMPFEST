@@ -6,7 +6,7 @@ interface WelcomePageProps {
   onGetStarted?: () => void;
 }
 
-export default function WelcomePage({ onGetStarted }: WelcomePageProps) {
+export default function Welcomepage({ onGetStarted }: WelcomePageProps) {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
