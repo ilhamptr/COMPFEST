@@ -30,14 +30,12 @@ export default function RootLayout() {
           name="home"
           options={{
             headerShown: false,
-            title: 'Home'
           }}
         />
         <Stack.Screen
           name="recipe-result"
           options={{
             headerShown: false,
-            title: 'Recipe Result',
             gestureEnabled: true
           }}
         />
@@ -45,7 +43,6 @@ export default function RootLayout() {
           name="+not-found"
           options={{
             headerShown: false,
-            title: 'Not Found'
           }}
         />
       </Stack>

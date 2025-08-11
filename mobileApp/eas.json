@@ -15,8 +15,7 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease",
-        "artifactPath": "ingredish.apk"
+        "gradleCommand": ":app:assembleRelease"
       },
       "ios": {
         "simulator": true
@@ -25,20 +24,12 @@
     "production": {
       "autoIncrement": true,
       "android": {
-        "buildType": "app-bundle",
-        "artifactPath": "ingredish.apk"
+        "buildType": "apk"
       }
-    },
-    "development-simulator": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "ios": {
-        "simulator": true
-      },
-      "environment": "development"
     }
   },
   "submit": {
     "production": {}
   }
 }
+

@@ -13,7 +13,6 @@ export default function IngredientsEditor({
   const [isEditing, setIsEditing] = useState(false);
   const [editableText, setEditableText] = useState(ingredients);
 
-  // Update editableText when ingredients prop changes (from image recognition)
   useEffect(() => {
     console.log("IngredientsEditor: ingredients prop changed to:", ingredients);
     setEditableText(ingredients);
@@ -25,85 +24,134 @@ export default function IngredientsEditor({
   };
 
   const handleCancel = () => {
-    setEditableText(ingredients); // Reset to original
+    setEditableText(ingredients);
     setIsEditing(false);
   };
 
   const handleEditPress = () => {
-    setEditableText(ingredients); // Sync with current ingredients
+    setEditableText(ingredients);
     setIsEditing(true);
   };
 
   return (
     <>
-      <TouchableOpacity
-        onPress={handleEditPress}
-        className="w-full h-[145px] mb-6 relative"
-      >
-        <View className="w-full h-full bg-white rounded-[16px] border border-[#BAB7B7] p-3">
+      {/* Main Ingredients Display */}
+      <View className="p-6">
+        <View className="flex-row items-center justify-between mb-4">
           <Text
-            className="text-black text-sm font-normal leading-[21px] mb-2"
+            className="text-gray-800 text-lg font-semibold"
             style={{ fontFamily: "Plus Jakarta Sans" }}
           >
-            Ingredients detected :
+            🥬 Detected Ingredients
           </Text>
-          <Text
-            className="text-black text-sm font-normal leading-[21px] flex-1"
-            style={{ fontFamily: "Plus Jakarta Sans" }}
+          <TouchableOpacity
+            onPress={handleEditPress}
+            className="bg-orange-100 px-4 py-2 rounded-full"
+            activeOpacity={0.7}
           >
-            {ingredients || "No ingredients detected yet. Upload an image to get started."}
-          </Text>
-          <View className="absolute bottom-2 right-2">
             <Text
-              className="text-black text-sm font-light opacity-30"
+              className="text-orange-600 text-sm font-medium"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              tap to edit...
+              ✏️ Edit
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
 
-      <Modal visible={isEditing} transparent={true} animationType="slide">
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="w-[90%] bg-white rounded-lg p-4">
-            <Text
-              className="text-black text-lg font-bold mb-4"
-              style={{ fontFamily: "Plus Jakarta Sans" }}
-            >
-              Edit Ingredients
-            </Text>
-            <TextInput
-              className="w-full h-[100px] bg-gray-50 rounded-[10px] border border-[#EEEBE9] p-3 text-[#070707] text-sm"
-              style={{ fontFamily: "Plus Jakarta Sans" }}
-              value={editableText}
-              onChangeText={setEditableText}
-              multiline={true}
-              textAlignVertical="top"
-            />
-            <View className="flex-row justify-end mt-4 space-x-2">
+        <View className="bg-gray-50 rounded-2xl p-4 min-h-[120px]">
+          <Text
+            className="text-gray-700 text-base leading-6"
+            style={{ fontFamily: "Plus Jakarta Sans" }}
+          >
+            {editableText ||
+              "No ingredients detected yet. Upload an image to scan ingredients automatically."}
+          </Text>
+        </View>
+
+        <Text
+          className="text-gray-400 text-xs mt-2"
+          style={{ fontFamily: "Plus Jakarta Sans" }}
+        >
+          Tap 'Edit' to modify ingredients or add your own
+        </Text>
+      </View>
+
+      {/* Edit Modal */}
+      <Modal
+        visible={isEditing}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={handleCancel}
+      >
+        <View className="flex-1 bg-white">
+          {/* Modal Header */}
+          <View className="bg-gradient-to-r from-orange-400 to-amber-400 pt-12 pb-6 px-6">
+            <View className="flex-row items-center justify-between">
               <TouchableOpacity
                 onPress={handleCancel}
-                className="px-4 py-2 bg-gray-200 rounded-lg mr-2"
+                className="bg-white/20 rounded-full px-4 py-2"
               >
-                <Text
-                  className="text-black"
-                  style={{ fontFamily: "Plus Jakarta Sans" }}
-                >
-                  Cancel
-                </Text>
+                <Text className="text-white font-medium">Cancel</Text>
               </TouchableOpacity>
+
+              <Text
+                className="text-white text-xl font-bold"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                Edit Ingredients
+              </Text>
+
               <TouchableOpacity
                 onPress={handleSave}
-                className="px-4 py-2 bg-[#F09642] rounded-lg"
+                className="bg-white rounded-full px-4 py-2"
               >
-                <Text
-                  className="text-black font-bold"
-                  style={{ fontFamily: "Plus Jakarta Sans" }}
-                >
-                  Save
-                </Text>
+                <Text className="text-orange-600 font-bold">Save</Text>
               </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Modal Content */}
+          <View className="flex-1 p-6">
+            <Text
+              className="text-gray-800 text-base mb-4"
+              style={{ fontFamily: "Plus Jakarta Sans" }}
+            >
+              Modify your ingredients list. Separate each ingredient with a comma.
+            </Text>
+
+            <TextInput
+              value={editableText}
+              onChangeText={setEditableText}
+              placeholder="Enter ingredients separated by commas..."
+              multiline
+              className="flex-1 bg-gray-50 rounded-2xl p-4 text-base"
+              style={{
+                fontFamily: "Plus Jakarta Sans",
+                textAlignVertical: "top",
+              }}
+              placeholderTextColor="#9CA3AF"
+            />
+
+            <View className="mt-6 space-y-3">
+              <Text
+                className="text-gray-600 text-sm font-medium"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                💡 Tips:
+              </Text>
+              <Text
+                className="text-gray-500 text-sm leading-5"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                • Use specific ingredient names (e.g., "chicken breast" instead of
+                "chicken")
+              </Text>
+              <Text
+                className="text-gray-500 text-sm leading-5"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                • Include quantities if you want more precise recipes
+              </Text>
             </View>
           </View>
         </View>
